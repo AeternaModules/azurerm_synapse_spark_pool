@@ -63,5 +63,107 @@ EOT
       filename = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.min_executors == null || (v.min_executors >= 0 && v.min_executors <= 200)
+      )
+    ])
+    error_message = "must be between 0 and 200"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.max_executors == null || (v.max_executors >= 0 && v.max_executors <= 200)
+      )
+    ])
+    error_message = "must be between 0 and 200"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.node_count == null || (v.node_count >= 3 && v.node_count <= 200)
+      )
+    ])
+    error_message = "must be between 3 and 200"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.auto_scale == null || (v.auto_scale.min_node_count >= 3 && v.auto_scale.min_node_count <= 200)
+      )
+    ])
+    error_message = "must be between 3 and 200"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.auto_scale == null || (v.auto_scale.max_node_count >= 3 && v.auto_scale.max_node_count <= 200)
+      )
+    ])
+    error_message = "must be between 3 and 200"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.auto_pause == null || (v.auto_pause.delay_in_minutes >= 5 && v.auto_pause.delay_in_minutes <= 10080)
+      )
+    ])
+    error_message = "must be between 5 and 10080"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.spark_config == null || (length(v.spark_config.content) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        v.spark_config == null || (length(v.spark_config.filename) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_spark_pools : (
+        contains(["3.4", "3.5"], v.spark_version)
+      )
+    ])
+    error_message = "must be one of: 3.4, 3.5"
+  }
+  # --- Unconfirmed validation candidates, derived from azurerm_synapse_spark_pool's provider source ---
+  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
+  # or a path that crosses a list-typed block (needs its own for_each wrapping).
+  # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   source:    [from validate.SparkPoolName] !ok
+  # path: name
+  #   source:    [from validate.SparkPoolName] !regexp.MustCompile(`^[a-zA-Z][a-zA-Z\d]{0,14}$`).MatchString(v)
+  # path: synapse_workspace_id
+  #   source:    [from validate.WorkspaceID] !ok
+  # path: synapse_workspace_id
+  #   source:    [from validate.WorkspaceID] err != nil
+  # path: node_size_family
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: node_size
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: tags
+  #   condition: length(value) <= 50
+  #   message:   [from tags.Validate: invalid when len(value) > 50]
+  #   source:    [from tags.Validate: invalid when len(value) > 50]
+  # path: tags
+  #   condition: length(value) <= 512
+  #   message:   [from tags.Validate: invalid when len(value) > 512]
+  #   source:    [from tags.Validate: invalid when len(value) > 512]
+  # path: tags
+  #   source:    [from tags.Validate] err != nil
+  # path: tags
+  #   condition: length(value) <= 256
+  #   message:   [from tags.Validate: invalid when len(value) > 256]
+  #   source:    [from tags.Validate: invalid when len(value) > 256]
 }
 
