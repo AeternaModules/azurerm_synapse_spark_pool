@@ -1,3 +1,7 @@
+output "synapse_spark_pools_id" {
+  description = "Map of id values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
+  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.id }
+}
 output "synapse_spark_pools_auto_pause" {
   description = "Map of auto_pause values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
   value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.auto_pause }
