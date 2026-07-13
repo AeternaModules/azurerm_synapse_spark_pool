@@ -38,14 +38,14 @@ EOT
     spark_version                       = string
     synapse_workspace_id                = string
     cache_size                          = optional(number)
-    compute_isolation_enabled           = optional(bool) # Default: false
-    dynamic_executor_allocation_enabled = optional(bool) # Default: false
+    compute_isolation_enabled           = optional(bool)
+    dynamic_executor_allocation_enabled = optional(bool)
     max_executors                       = optional(number)
     min_executors                       = optional(number)
     node_count                          = optional(number)
-    session_level_packages_enabled      = optional(bool)   # Default: false
-    spark_events_folder                 = optional(string) # Default: "/events"
-    spark_log_folder                    = optional(string) # Default: "/logs"
+    session_level_packages_enabled      = optional(bool)
+    spark_events_folder                 = optional(string)
+    spark_log_folder                    = optional(string)
     tags                                = optional(map(string))
     auto_pause = optional(object({
       delay_in_minutes = number
@@ -63,78 +63,6 @@ EOT
       filename = string
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.min_executors == null || (v.min_executors >= 0 && v.min_executors <= 200)
-      )
-    ])
-    error_message = "must be between 0 and 200"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.max_executors == null || (v.max_executors >= 0 && v.max_executors <= 200)
-      )
-    ])
-    error_message = "must be between 0 and 200"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.node_count == null || (v.node_count >= 3 && v.node_count <= 200)
-      )
-    ])
-    error_message = "must be between 3 and 200"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.auto_scale == null || (v.auto_scale.min_node_count >= 3 && v.auto_scale.min_node_count <= 200)
-      )
-    ])
-    error_message = "must be between 3 and 200"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.auto_scale == null || (v.auto_scale.max_node_count >= 3 && v.auto_scale.max_node_count <= 200)
-      )
-    ])
-    error_message = "must be between 3 and 200"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.auto_pause == null || (v.auto_pause.delay_in_minutes >= 5 && v.auto_pause.delay_in_minutes <= 10080)
-      )
-    ])
-    error_message = "must be between 5 and 10080"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.spark_config == null || (length(v.spark_config.content) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        v.spark_config == null || (length(v.spark_config.filename) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_spark_pools : (
-        contains(["3.4", "3.5"], v.spark_version)
-      )
-    ])
-    error_message = "must be one of: 3.4, 3.5"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_synapse_spark_pool's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -151,6 +79,33 @@ EOT
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: node_size
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: min_executors
+  #   condition: value >= 0 && value <= 200
+  #   message:   must be between 0 and 200
+  # path: max_executors
+  #   condition: value >= 0 && value <= 200
+  #   message:   must be between 0 and 200
+  # path: node_count
+  #   condition: value >= 3 && value <= 200
+  #   message:   must be between 3 and 200
+  # path: auto_scale.min_node_count
+  #   condition: value >= 3 && value <= 200
+  #   message:   must be between 3 and 200
+  # path: auto_scale.max_node_count
+  #   condition: value >= 3 && value <= 200
+  #   message:   must be between 3 and 200
+  # path: auto_pause.delay_in_minutes
+  #   condition: value >= 5 && value <= 10080
+  #   message:   must be between 5 and 10080
+  # path: spark_config.content
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: spark_config.filename
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: spark_version
+  #   condition: contains(["3.4", "3.5"], value)
+  #   message:   must be one of: 3.4, 3.5
   # path: tags
   #   condition: length(value) <= 50
   #   message:   [from tags.Validate: invalid when len(value) > 50]
