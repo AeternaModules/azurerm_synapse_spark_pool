@@ -4,11 +4,11 @@ output "synapse_spark_pools_id" {
 }
 output "synapse_spark_pools_auto_pause" {
   description = "Map of auto_pause values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
-  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.auto_pause if v.auto_pause != null && length(v.auto_pause) > 0 }
+  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => one(v.auto_pause) if v.auto_pause != null && length(v.auto_pause) > 0 }
 }
 output "synapse_spark_pools_auto_scale" {
   description = "Map of auto_scale values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
-  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.auto_scale if v.auto_scale != null && length(v.auto_scale) > 0 }
+  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => one(v.auto_scale) if v.auto_scale != null && length(v.auto_scale) > 0 }
 }
 output "synapse_spark_pools_cache_size" {
   description = "Map of cache_size values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
@@ -24,7 +24,7 @@ output "synapse_spark_pools_dynamic_executor_allocation_enabled" {
 }
 output "synapse_spark_pools_library_requirement" {
   description = "Map of library_requirement values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
-  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.library_requirement if v.library_requirement != null && length(v.library_requirement) > 0 }
+  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => one(v.library_requirement) if v.library_requirement != null && length(v.library_requirement) > 0 }
 }
 output "synapse_spark_pools_max_executors" {
   description = "Map of max_executors values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
@@ -56,7 +56,7 @@ output "synapse_spark_pools_session_level_packages_enabled" {
 }
 output "synapse_spark_pools_spark_config" {
   description = "Map of spark_config values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
-  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => v.spark_config if v.spark_config != null && length(v.spark_config) > 0 }
+  value       = { for k, v in azurerm_synapse_spark_pool.synapse_spark_pools : k => one(v.spark_config) if v.spark_config != null && length(v.spark_config) > 0 }
 }
 output "synapse_spark_pools_spark_events_folder" {
   description = "Map of spark_events_folder values across all synapse_spark_pools, keyed the same as var.synapse_spark_pools"
